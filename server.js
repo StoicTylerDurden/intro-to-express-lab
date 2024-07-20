@@ -38,8 +38,12 @@ Functionality: If a valid number is provided, respond with a random whole number
 */
 
 app.get('/roll/:number', (req, res) =>{
+    requestedNum = Number(req.params.number)
+    requestedNum += 1
+    const randomNum = Math.floor(Math.random() * requestedNum)
     if (!isNaN(req.params.number)){
-        res.send(`You rolled a ${req.params.number}`)
+        
+        res.send(`You rolled a ${randomNum}`)
     }
     else {
         res.send(`You must specify a number`)
@@ -90,33 +94,26 @@ type: Shows only shoes of the specified type.
 No parameters: Responds with the full list of shoes.
 */
 
-const shoes = [
-    { name: "Birkenstocks", price: 50, type: "sandal" },
-    { name: "Air Jordans", price: 500, type: "sneaker" },
-    { name: "Air Mahomeses", price: 501, type: "sneaker" },
-    { name: "Utility Boots", price: 20, type: "boot" },
-    { name: "Velcro Sandals ", price: 15, type: "sandal" },
-    { name: "Jet Boots", price: 1000, type: "boot" },
-    { name: "Fifty-Inch Heels", price: 175, type: "heel" }
-];
 
-app.get('/shoes', (req, res) => {
-
-    let returnedShoes = shoes;
-    const minPrice = req.query.minPrice
-    const maxPrice = req.query.maxPrice
-    const type = req.query.type
-
-    if(minPrice) {
-        returnedShoes = shoes.filter(shoe => shoe.price > minPrice)
-    } 
-    if (maxPrice) {
-        returnedShoes = shoes.filter(shoe => shoe.price < maxPrice)
+app.get('/shoes',(req,res)=>{
+    let shoes = [
+        { name: "Birkenstocks", price: 50, type: "sandal" },
+        { name: "Air Jordans", price: 500, type: "sneaker" },
+        { name: "Air Mahomeses", price: 501, type: "sneaker" },
+        { name: "Utility Boots", price: 20, type: "boot" },
+        { name: "Velcro Sandals", price: 15, type: "sandal" },
+        { name: "Jet Boots", price: 1000, type: "boot" },
+        { name: "Fifty-Inch Heels", price: 175, type: "heel" }
+    ];
+    if(req.query.hasOwnProperty('min-price')){
+        shoes = shoes.filter(shoe => shoe.price >= Number(req.query['min-price']));
     }
-    if(type){    
-        returnedShoes = shoes.filter((shoe) => shoe.type === type)
+    if(req.query.hasOwnProperty('max-price')){
+        shoes = shoes.filter(shoe => shoe.price <= Number(req.query['max-price']));
     }
+    if(req.query.hasOwnProperty('type')){
+        shoes = shoes.filter(shoe => shoe.type === req.query['type']);
+    }
+    res.send(shoes);
+});
 
-    res.send(returnedShoes)
-
-})
